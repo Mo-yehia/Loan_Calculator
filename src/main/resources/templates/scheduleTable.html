@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repayment Schedule</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Repayment Schedule</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Serial Number</th>
+            <th>Installment Date</th>
+            <th>Opening Balance</th>
+            <th>Interest Amount</th>
+            <th>Installment Amount</th>
+            <th>Total Payment</th>
+            <th>Closing Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${schedule}">
+            <td th:text="${entry.serialNumber}"></td>
+            <td th:text="${entry.installmentDate}"></td>
+            <td th:text="${entry.openingBalance}"></td>
+            <td th:text="${entry.interestAmount}"></td>
+            <td th:text="${entry.installmentAmount}"></td>
+            <td th:text="${entry.totalPayment}"></td>
+            <td th:text="${entry.closingBalance}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/" class="back-button">Back to Form</a>
+</div>
+
+<script>
+     function formatNumber(number) {
+        let formattedNumber = parseFloat(number).toFixed(0).toLocaleString();
+        if (formattedNumber === "-0") {
+            return "0";
+        }
+        return formattedNumber;
+    }
+
+    document.querySelectorAll('td').forEach(function (cell) {
+        let cellValue = cell.textContent;
+        if (!isNaN(cellValue)) {
+            cell.textContent = formatNumber(cellValue);
+        }
+    });
+</script>
+</body>
+</html>

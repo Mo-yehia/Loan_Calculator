@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Schedule Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<h1>Loan Schedule Calculator</h1>
+<form id="loanForm" action="/schedule" method="post">
+    <label>Loan Amount:</label>
+    <input type="number" id="loanAmount" name="loanAmount" step="1" min="1" MAX="10000000000" required><br>
+
+    <label>Repayment Duration (Years):</label>
+    <small>Repayment duration must be at least 1 year!</small><br>
+    <input type="number" id="repaymentDurationYears" name="repaymentDurationYears" step="1" min="1" MAX="100" value="1" required><br>
+
+
+    <label>Grace Period (Months):</label>
+    <small>Leave it as Zero if there is no grace period!</small><br>
+    <span id="gracePeriodError" class="error"></span><br>
+    <input type="number" id="gracePeriodMonths" name="gracePeriodMonths" step="0" min="0" MAX="1188" value="0" ><br>
+
+
+    <label>Interest Rate (%):</label>
+    <input type="number" id="interestRate" name="interestRate" step="any" min="0.0" required><br>
+
+    <label>Loan Start Date:</label>
+    <input type="date" id="loanStartDate" name="loanStartDate" required><br>
+
+    <label>Installment Type:</label>
+    <select name="installmentType" required>
+        <option value="Annual">Annual</option>
+        <option value="Semi-Annual">Semi-Annual</option>
+        <option value="Quarterly">Quarterly</option>
+        <option value="Monthly">Monthly</option>
+    </select><br>
+
+    <button type="submit">Calculate Schedule</button>
+</form>
+
+<p id="errorMessage" class="error"></p>
+
+<script>
+
+    function validateGracePeriod() {
+            const installmentType = document.querySelector("select[name='installmentType']").value;
+            const gracePeriod = parseInt(document.querySelector("input[name='gracePeriodMonths']").value) || 0;
+            const repaymentDuration = parseInt(document.querySelector("input[name='repaymentDurationYears']").value) || 0;
+
+            // Clear previous error message
+            const errorMessage = document.getElementById("gracePeriodError");
+            errorMessage.textContent = "";
+
+            // Validate grace period
+            const maxGracePeriod = repaymentDuration * 12;
+            let isValid = true;
+
+            if (gracePeriod >= maxGracePeriod) {
+                errorMessage.textContent = "Grace period cannot exceed the total repayment duration.";
+                isValid = false;
+            } else if (installmentType === "Annual" && gracePeriod % 12 !== 0) {
+                errorMessage.textContent = "Grace period for annual installments must be in multiples of 12 months.";
+                isValid = false;
+            } else if (installmentType === "Semi-Annual" && gracePeriod % 6 !== 0) {
+                errorMessage.textContent = "Grace period for semi-annual installments must be in multiples of 6 months.";
+                isValid = false;
+            } else if (installmentType === "Quarterly" && gracePeriod % 3 !== 0) {
+                errorMessage.textContent = "Grace period for quarterly installments must be in multiples of 3 months.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function validateForm(event) {
+            if (!validateGracePeriod()) {
+                event.preventDefault(); // Prevent form submission
+                alert("Please correct the grace period to match the installment type.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            const gracePeriodInput = document.querySelector("input[name='gracePeriodMonths']");
+            const installmentTypeSelect = document.querySelector("select[name='installmentType']");
+
+            form.addEventListener("submit", validateForm);
+            gracePeriodInput.addEventListener("input", validateGracePeriod);
+            installmentTypeSelect.addEventListener("change", validateGracePeriod);
+
+
+        // Set today's date as the default value for the loan start date field
+        document.getElementById('loanStartDate').valueAsDate = new Date();
+
+        });
+</script>
+</body>
+</html>
